@@ -12,6 +12,7 @@ public class Rocket : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        // Move to the right relative to the rocket’s own orientation
         rb.velocity = transform.right * speed;
     }
 
@@ -23,28 +24,27 @@ public class Rocket : MonoBehaviour
 
     void Explode()
     {
-        // Instantiate explosion effect
+        // Instantiate explosion effect if assigned
         if (explosionEffect != null)
         {
             Instantiate(explosionEffect, transform.position, transform.rotation);
         }
 
-        // Get all colliders in explosion radius
+        // Damage all enemies in explosion radius
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, explosionRadius);
         foreach (Collider2D nearbyObject in colliders)
         {
-            if (nearbyObject.CompareTag("Enemy"))
+            if (nearbyObject.CompareTag("Zombie"))
             {
-                // Damage enemy
-                ZombieController enemy = nearbyObject.GetComponent<ZombieController>();
-                if (enemy != null)
+                ZombieController zombie = nearbyObject.GetComponent<ZombieController>();
+                if (zombie != null)
                 {
-                    enemy.TakeDamage(damage);
+                    zombie.TakeDamage(damage);
                 }
             }
         }
 
-        // Destroy the rocket
+        // Destroy the rocket after explosion
         Destroy(gameObject);
     }
 

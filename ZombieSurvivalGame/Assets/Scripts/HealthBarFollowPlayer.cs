@@ -13,7 +13,7 @@ public class HealthBarFollowPlayer : MonoBehaviour
             Vector3 worldPosition = playerTransform.position + offset;
             Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
 
-            // Round to the nearest pixel to avoid jitter
+            // Rounded to the nearest pixel to avoid jitter
             screenPosition.x = Mathf.Round(screenPosition.x);
             screenPosition.y = Mathf.Round(screenPosition.y);
 

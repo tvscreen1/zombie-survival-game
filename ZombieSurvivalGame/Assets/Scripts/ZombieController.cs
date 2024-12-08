@@ -128,8 +128,6 @@ public class ZombieController : MonoBehaviour
         spriteRenderer.flipX = !spriteRenderer.flipX;
     }
 
-    // New methods
-
     public void TakeDamage(int amount)
     {
         health -= amount;
@@ -141,8 +139,13 @@ public class ZombieController : MonoBehaviour
 
     void Die()
     {
+    // Notify the GameManager to increment the kill count
+    if (GameManager.Instance != null)
+    {
+        GameManager.Instance.AddKill();
+    }
 
-        // Destroy the zombie GameObject
-        Destroy(gameObject);
+    // Destroy the zombie GameObject
+    Destroy(gameObject);
     }
 }

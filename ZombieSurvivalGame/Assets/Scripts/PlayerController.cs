@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private bool isGrounded = false;
     private bool isClimbing = false;
-    private bool facingRight = true; // Added variable to track facing direction
+    private bool facingRight = true; // Tracks facing direction
 
     // Input variables
     private float moveInput;
@@ -136,14 +136,13 @@ public class PlayerController : MonoBehaviour
         scaler.x *= -1;
         transform.localScale = scaler;
 
-        // GetComponent<SpriteRenderer>().flipX = !GetComponent<SpriteRenderer>().flipX;
-
-        // Adjust the weapon mount's local position if necessary
-        if (weaponMount != null)
+        // Prevent flipping for the KillTrackerCanvas
+        Transform canvasParent = transform.Find("KillTrackerCanvas"); // Adjust name if different
+        if (canvasParent != null)
         {
-            Vector3 weaponPosition = weaponMount.localPosition;
-            weaponPosition.x *= -1;
-            weaponMount.localPosition = weaponPosition;
+            Vector3 canvasScale = canvasParent.localScale;
+            canvasScale.x = Mathf.Abs(canvasScale.x); // Ensure scale remains positive
+            canvasParent.localScale = canvasScale;
         }
     }
 }

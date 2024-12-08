@@ -2,56 +2,78 @@ using UnityEngine;
 
 public class Chainsaw : WeaponBase
 {
-    public Collider2D attackCollider;
+    [Header("Chainsaw Settings")]
+    public Collider2D attackCollider;   // The trigger collider representing the blade area
+    public AudioSource audioSource;     // Looping sound of the chainsaw
+    public AudioClip chainsawSound;
+    public int damagePerFrame = 7995;      // Damage applied each frame to enemies inside the blade
+
+    private bool isActive = false;
 
     private void Start()
     {
         weaponName = "Chainsaw";
-        maxAmmo = 100; // Represents fuel or durability
+        maxAmmo = 100;    // Represents fuel.
         ammoCount = maxAmmo;
-        fireRate = 0f; // Immediate action
-        isAutomatic = true;
+        fireRate = 0f; 
+        isAutomatic = true; // Holding Fire1 keeps it active
 
-        if (attackCollider == null)
-        {
-            Debug.LogWarning("Attack Collider not assigned on Chainsaw.");
-        }
-
-        // Ensure the attack collider is disabled initially
+        // Disable the attack collider initially
         if (attackCollider != null)
-        {
             attackCollider.enabled = false;
+        
+        // Setup audio
+        if (audioSource != null && chainsawSound != null)
+        {
+            audioSource.loop = true;
+            audioSource.clip = chainsawSound;
         }
     }
 
     public override void Fire()
     {
-        if (ammoCount > 0)
+        if (!isActive)
         {
-            // Enable attack collider to damage enemies
+            // Activate chainsaw
             if (attackCollider != null)
-            {
                 attackCollider.enabled = true;
-                Debug.Log("Chainsaw activated.");
-            }
 
-            // Decrease ammo over time
-            ammoCount--;
-        }
-        else
-        {
-            Debug.Log("Chainsaw is out of fuel!");
-            StopFire();
+            if (audioSource != null && !audioSource.isPlaying && chainsawSound != null)
+                audioSource.Play();
+
+            isActive = true;
         }
     }
 
     public void StopFire()
     {
-        // Disable attack collider
+        // Deactivate chainsaw
         if (attackCollider != null)
-        {
             attackCollider.enabled = false;
-            Debug.Log("Chainsaw deactivated.");
+
+        if (audioSource != null && audioSource.isPlaying)
+            audioSource.Stop();
+
+        isActive = false;
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        // Damage enemies continuously while chainsaw is active
+        if (isActive && other.CompareTag("Zombie"))
+        {
+            ZombieController zombie = other.GetComponent<ZombieController>();
+            if (zombie != null)
+            {
+                zombie.TakeDamage(damagePerFrame * 8);
+            }
         }
+    }
+
+    public override void Reload()
+    {
+        // Optional: Refuel
+        ammoCount = maxAmmo;
+        Debug.Log($"{weaponName} refueled.");
     }
 }
